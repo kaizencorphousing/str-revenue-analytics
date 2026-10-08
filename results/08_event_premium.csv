@@ -1,0 +1,10 @@
+event_type,day_type,event_nights,avg_event_price,baseline_price,baseline_nights,premium_pct
+home_game,Fri/Sat,6,875.0,267.73,67,226.8
+commencement,Sun-Thu,2,342.5,147.33,207,132.5
+local_event,Sun-Thu,1,325.0,147.33,207,120.6
+commencement,Fri/Sat,4,500.0,267.73,67,86.8
+home_game,Sun-Thu,1,250.0,147.33,207,69.7
+local_event,Fri/Sat,3,400.0,267.73,67,49.4
+holiday,Sun-Thu,1,220.0,147.33,207,49.3
+holiday,Fri/Sat,2,230.0,267.73,67,-14.1
+away_game,Fri/Sat,6,169.17,267.73,67,-36.8

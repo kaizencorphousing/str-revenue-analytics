@@ -1,0 +1,5 @@
+length_bucket,stays,nights,contribution,contribution_per_night,contribution_per_stay
+1: 1-2 nights,4,7,4178.89,596.98,1044.72
+2: 3-6 nights,2,8,2117.16,264.64,1058.58
+3: 7-27 nights,2,20,2479.2,123.96,1239.6
+4: 28+ nights,1,31,3170.06,102.26,3170.06
