@@ -41,3 +41,13 @@ A window function computes across related rows without collapsing them the way G
 
 **Interview question:** How do you find a median in SQL when the database has no MEDIAN function, and how do you handle an even number of rows?
 (Number the rows with `ROW_NUMBER() OVER (ORDER BY x)` and count them with `COUNT(*) OVER ()`, then keep rows where rn is `(n+1)/2` or `(n+2)/2` using integer division and average them. With odd n both expressions point at the same middle row; with even n they pick the two middle rows.)
+
+## Phase 4: Dashboard
+
+**Built:** `src/export.py` writes anonymized CSVs to `data/processed/`. `app/dashboard.py` (Streamlit + Plotly) shows KPI tiles, a night-by-night calendar heatmap, monthly revenue vs rent, weekday vs weekend, price history, price vs market, and a "Where the money leaks" tab, plus a findings panel computed from the data. `docs/TABLEAU_GUIDE.md` explains how to rebuild it in Tableau Public.
+
+**Concept: separate the serving layer from the pipeline, and make every number traceable.**
+The dashboard never calls the API or opens the database: it reads small, anonymized CSVs that the pipeline exports. That makes it safe to host publicly and fast to load, and it means one bad API day can't break the live site. The KPI tiles use the same definitions as query 01 and were checked to match it to the cent, so the dashboard can't quietly disagree with the SQL. Findings are computed from the data rather than typed in, so they stay true when the data changes. Design is restrained on purpose: one accent colour means "booked" everywhere, so a viewer learns it once.
+
+**Interview question:** Why does the dashboard read exported CSVs instead of querying the database or the API directly?
+(Security: no token or raw guest data on the public host. Reliability: the site doesn't depend on the API being up. Consistency: everyone sees the same snapshot that the analysis used. The trade-off is freshness: data is only as new as the last pipeline run.)

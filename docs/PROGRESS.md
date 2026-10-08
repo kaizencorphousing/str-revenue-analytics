@@ -8,7 +8,7 @@ Updated at the end of every phase. A fresh session reads this to know where we a
 | 1 Extract | done | Phase 1 commit | 15 reservations (9 accepted, 1 cancelled, 2 denied, 3 expired), 266 calendar days; 6 offline tests pass |
 | 2 Transform + load | done | Phase 2 commit | 15 reservations, 66 booked nights, 266 calendar rows; 6/6 reconciliation checks pass; 15 tests pass |
 | 3 Analysis SQL | done | Phase 3 commit | 13 queries run; results/RESULTS.md + 13 CSVs; all 16 SPEC reference numbers match exactly |
-| 4 Dashboard | not started | | |
+| 4 Dashboard | done | Phase 4 commit | Streamlit app runs with 0 exceptions; KPI tiles = query 01 exactly (36.7% / $284.14 / $63.21 / $8,786.61); TABLEAU_GUIDE.md written |
 | 5 Pipeline, tests, docs, repo | not started | | |
 
 ## Decisions made
@@ -30,9 +30,11 @@ Updated at the end of every phase. A fresh session reads this to know where we a
 - 2026-10-08: Phase 3 query conventions: windows default to Aug 15-Dec 31 2026 where the spec says so; Q02/Q12 cover the whole spine (Aug 2026-Jun 2027), so forward months mostly show unsold future nights. Rent is the full $2,350 even for partial August. Conversion = accepted / all records (cancelled stays in the denominator). The 15.5% Airbnb fee in Q12 is hardcoded per spec.
 - 2026-10-08: Postgres differences are noted in each query header (NUMERIC money, ROUND casts, SUM(boolean) -> COUNT FILTER, julianday -> date subtraction, CEIL).
 - 2026-10-08: **Headline findings (Oct 8 data):** Sun-Thu occupancy 31.0% vs Fri/Sat 51.3%; the Sun-Thu booked ADR is only $135.74. Oct occupancy 19.4%, Nov 6.7%. Away-game weekends are priced 36.8% *below* ordinary weekends. Vrbo converted 1 of 6 requests; all 5 losses were for nights already sold on Airbnb (calendar sync / availability problem, not price). Discounts gave away 22.5% of gross rent. The 31-night stay earns $102/night contribution vs $597 for 1-2 night stays. The biggest unsold run is Nov 8-Dec 22 (45 nights, $7,885 at current ask). Oct is 2 nights short of covering rent; Nov needs 8, Dec 12.
+- 2026-10-08: The dashboard reads only `data/processed/*.csv`, written by `src/export.py` (anonymized: surrogate ids only, calendar notes not exported). Findings are computed from the data at render time; finding 3 picks the night with the largest list-price swing.
+- 2026-10-08: Colour: blue `#2a78d6` means *booked* only; covered-rent and weekend bars use dark grey. The Streamlit theme is in `.streamlit/config.toml`.
+- 2026-10-08: The date filter (default Aug 15-Dec 31 2026) drives the KPIs, calendar, monthly and weekday charts. Findings stay fixed to the default window.
 
 ## Open issues
 - Surrogate ids (R01...) are ordered by check-in, so they shift if a new booking lands earlier than existing ones. Mention this in the README limitations (Phase 5).
-- Calendar `note` holds owner-written pricing/event notes. Eyeball them before Phase 4 exports any notes.
 - Phase 5 tests still to add: `build_calendar`, `fact_nightly` statuses, and the load checks against a tiny fixture DB.
-- Q02 could label forward months, or the dashboard could separate past from forward-looking months (Phase 4).
+- The monthly chart compares partial August (17 nights) with full rent; the caption says so.

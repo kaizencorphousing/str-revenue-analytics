@@ -1,0 +1,26 @@
+night_date,changed_on,list_price,reason
+2026-10-13,2026-09-29,145.0,rebuilt via Hospitable
+2026-10-13,2026-10-04,130.0,comp median audit
+2026-10-13,2026-10-08,95.0,fill mode
+2026-10-16,2026-08-28,294.0,initial event model
+2026-10-16,2026-09-14,400.0,aggressive repricing off broad comps
+2026-10-16,2026-09-29,175.0,rebuilt via Hospitable after overwrite
+2026-10-16,2026-10-04,150.0,comp median audit
+2026-10-16,2026-10-08,125.0,fill mode weekly step
+2026-10-17,2026-08-28,376.0,initial event model
+2026-10-17,2026-09-14,470.0,aggressive repricing off broad comps
+2026-10-17,2026-09-29,185.0,rebuilt via Hospitable after overwrite
+2026-10-17,2026-10-04,160.0,comp median audit
+2026-10-17,2026-10-08,135.0,fill mode weekly step
+2026-10-31,2026-08-28,440.0,initial event model
+2026-10-31,2026-09-14,490.0,aggressive repricing off broad comps
+2026-10-31,2026-09-29,240.0,rebuilt via Hospitable after overwrite
+2026-10-31,2026-10-08,210.0,fill mode
+2026-11-14,2026-08-28,537.0,initial event model
+2026-11-14,2026-09-14,600.0,aggressive repricing off broad comps
+2026-11-14,2026-09-29,205.0,rebuilt via Hospitable after overwrite
+2026-11-14,2026-10-08,180.0,fill mode
+2026-11-21,2026-08-28,848.0,initial event model
+2026-11-21,2026-09-14,1000.0,aggressive repricing off broad comps
+2026-11-21,2026-09-29,650.0,rebuilt via Hospitable after overwrite
+2026-11-21,2026-10-08,650.0,held (premier home game)

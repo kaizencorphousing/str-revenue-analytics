@@ -1,0 +1,6 @@
+lost_request,platform,status,checkin,checkout,requested_on,overlapping_stay,stay_platform,stay_booked_on,already_sold_at_request,overlap_nights
+R03,vrbo,expired,2026-09-24,2026-09-26,2026-09-18,R04,airbnb,2026-07-31,1,1
+R05,vrbo,expired,2026-09-26,2026-09-27,2026-09-20,R04,airbnb,2026-07-31,1,1
+R06,vrbo,declined,2026-09-26,2026-09-27,2026-09-21,R04,airbnb,2026-07-31,1,1
+R08,vrbo,expired,2026-10-09,2026-10-11,2026-09-19,R07,airbnb,2026-08-14,1,2
+R09,vrbo,declined,2026-10-10,2026-10-11,2026-09-18,R07,airbnb,2026-08-14,1,1
