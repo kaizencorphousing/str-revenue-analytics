@@ -1,0 +1,27 @@
+night_date,event,event_type
+2026-10-09,Homecoming (South Carolina) eve,home_game
+2026-10-10,Homecoming (South Carolina),home_game
+2026-10-16,Texas away weekend,away_game
+2026-10-17,Texas away weekend,away_game
+2026-10-30,Halloween weekend (UGA in Atlanta),away_game
+2026-10-31,Halloween weekend (UGA in Atlanta),away_game
+2026-11-06,Oklahoma eve,home_game
+2026-11-07,Oklahoma,home_game
+2026-11-13,Kentucky away weekend,away_game
+2026-11-14,Kentucky away weekend,away_game
+2026-11-19,Vanderbilt arrival,home_game
+2026-11-20,Vanderbilt eve,home_game
+2026-11-21,Vanderbilt,home_game
+2026-11-26,Thanksgiving,holiday
+2026-11-27,Thanksgiving weekend (FSU away),holiday
+2026-11-28,Thanksgiving weekend (FSU away),holiday
+2026-12-10,Commencement arrival (projected),commencement
+2026-12-11,UF fall commencement (projected),commencement
+2026-12-12,UF fall commencement (projected),commencement
+2027-03-11,NHRA Gatornationals,local_event
+2027-03-12,NHRA Gatornationals,local_event
+2027-03-13,NHRA Gatornationals,local_event
+2027-04-10,Orange and Blue weekend (projected),local_event
+2027-04-29,UF spring commencement,commencement
+2027-04-30,UF spring commencement,commencement
+2027-05-01,UF spring commencement,commencement
