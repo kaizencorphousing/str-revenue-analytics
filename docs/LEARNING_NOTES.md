@@ -21,3 +21,13 @@ Extraction should copy the source as-is into a landing zone, so every later step
 
 **Interview question:** Why save the raw API response before transforming it, instead of transforming in memory and only saving the clean table?
 (Saving raw data makes the pipeline reproducible and debuggable: you can re-run transforms offline, fix a transform bug without re-pulling, compare snapshots over time, and prove where every number came from.)
+
+## Phase 2: Transform and load
+
+**Built:** `src/transform.py` turns raw JSON plus seed CSVs into clean tables (cents become dollars here and only here). `sql/schema.sql` defines the SQLite model: `reservations` (one booking request), `reservation_nights` (one booked night), `calendar_snapshot` (one night per pull), seed tables, the `dim_date` spine, a `data_quality_log`, and the `fact_nightly` view. `src/load.py` builds `gainesville.db`, runs 6 reconciliation checks, and exits with an error if any fail.
+
+**Concept: grain, reconciliation and a date spine.**
+Every table has a *grain*, meaning what one row represents. Mixing grains (for example joining nightly rows to booking-level fees without dividing) silently double-counts money. A **date spine** (`dim_date`) has one row for every calendar date, so nights with no booking still appear and occupancy can be computed as booked / all nights; an inner join would hide the empty nights. **Reconciliation** means proving the cleaned data still adds up to the source: here, nightly prices must sum to each stay's rent to the cent, revenue must rebuild from its parts, and no night can be sold twice. Every judgement call (summing a duplicated date, spreading Vrbo rent evenly, relabelling "denied") goes into `data_quality_log`, so the cleaning is auditable instead of hidden.
+
+**Interview question:** Why build a date spine and LEFT JOIN bookings onto it, instead of just querying the bookings table for occupancy?
+(Bookings only contain sold nights. Without a spine you can't count the unsold nights, so occupancy, gaps and RevPAR all come out wrong. The LEFT JOIN keeps every date and leaves NULLs where nothing was booked.)

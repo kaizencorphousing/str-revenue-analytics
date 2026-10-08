@@ -6,7 +6,7 @@ Updated at the end of every phase. A fresh session reads this to know where we a
 |---|---|---|---|
 | 0 Scaffold | done | first commit | venv, pinned requirements, git init; ignore check + pip install verified |
 | 1 Extract | done | Phase 1 commit | 15 reservations (9 accepted, 1 cancelled, 2 denied, 3 expired), 266 calendar days; 6 offline tests pass |
-| 2 Transform + load | not started | | |
+| 2 Transform + load | done | Phase 2 commit | 15 reservations, 66 booked nights, 266 calendar rows; 6/6 reconciliation checks pass; 15 tests pass |
 | 3 Analysis SQL | not started | | |
 | 4 Dashboard | not started | | |
 | 5 Pipeline, tests, docs, repo | not started | | |
@@ -23,6 +23,12 @@ Updated at the end of every phase. A fresh session reads this to know where we a
 - 2026-10-08: `date_query=checkin` is pinned so the date window is unambiguously on check-in. `include=financials,properties` is used, and the extractor exits if any reservation isn't tied only to GAINESVILLE (`3841e818-afdd-4e3f-8d6c-754c4ba81cd6`).
 - 2026-10-08: One calendar call covers the full range (266 days); 365-day chunking is kept as a fallback.
 - 2026-10-08: The PII hook command now uses `git rev-parse --show-toplevel` instead of `$CLAUDE_PROJECT_DIR`, which still pointed at the old OneDrive path after the move and blocked every Bash call.
+- 2026-10-08: Phase 2 modelling choices: discounts and fees are stored as **positive** dollars. `platform_fee` = channel fee only (Airbnb host service fee, Vrbo commission); Hospitable's own fee is in `pms_fee`, and pass-through lodging tax is in `host_taxes` (excluded from `net_rev_ex_cleaning`). Today, pms_fee and taxes only appear on unconverted Vrbo requests, so revenue is unaffected.
+- 2026-10-08: The transform refuses to build if any reservation's API revenue can't be rebuilt from its parts to the cent, or if checkout - checkin != nights.
+- 2026-10-08: `night_status` = booked / vacant_past (before the latest snapshot date, unsold) / open_for_sale / blocked / not_in_snapshot. If two calendar pulls happen on the same day, the later one wins (logged).
+- 2026-10-08: Sanity check against the SPEC Phase 3 reference, Aug 15-Dec 31: 139 nights, 51 booked, 36.7%, ADR $284.14, net ex cleaning $8,786.61. **Exact match.** Note: net revenue rounds per night in `fact_nightly`; the unrounded sum is $8,786.67.
 
 ## Open issues
-- The Phase 2 transform must map `denied` -> declined and pick `status` as the canonical field.
+- Surrogate ids (R01...) are ordered by check-in, so they shift if a new booking lands earlier than existing ones. Mention this in the README limitations (Phase 5).
+- Calendar `note` holds owner-written pricing/event notes. Eyeball them before Phase 4 exports any notes.
+- Phase 5 tests still to add: `build_calendar`, `fact_nightly` statuses, and the load checks against a tiny fixture DB.
