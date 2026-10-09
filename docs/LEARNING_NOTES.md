@@ -51,3 +51,66 @@ The dashboard never calls the API or opens the database: it reads small, anonymi
 
 **Interview question:** Why does the dashboard read exported CSVs instead of querying the database or the API directly?
 (Security: no token or raw guest data on the public host. Reliability: the site doesn't depend on the API being up. Consistency: everyone sees the same snapshot that the analysis used. The trade-off is freshness: data is only as new as the last pipeline run.)
+
+## Phase 5: Pipeline, tests, docs
+
+**Built:** `run_all.py` (extract, then load with checks, then queries, then export; `--offline` skips the API), a 44-test pytest suite that runs the real pipeline on a synthetic fixture, the README case study, a resume page and a daily schedule.
+
+**Concept: tests as proof, and orchestration.**
+An orchestrator runs the steps in order and stops at the first failure, so a bad extract can never quietly feed the dashboard. The tests run the *real* transform and load code on a tiny made-up dataset whose answers I worked out by hand (5 booked nights, $160 ADR, $660 net). If the SQL or the cleaning logic changes behaviour, a test fails. Because the fixture is synthetic, the suite runs on a fresh clone without any private guest data, and a separate test scans every exported file for PII patterns.
+
+---
+
+## Concept index
+
+**API pagination.** APIs return big lists in pages. You request `page=1, 2, ...` until the response says you've reached `last_page`. If the server replies 429 "too many requests", you wait and retry (backoff) instead of failing.
+
+**Surrogate keys.** An id we invent (R01, R02...) instead of using the platform's confirmation code. It hides PII, it's short, and it carries no business meaning. The trade-off here is that ids are re-assigned by check-in order on every build.
+
+**Grain.** What one row means: one booking request, one booked night, one date. Joining tables of different grains without care duplicates rows; for example, joining a stay-level fee onto 31 nightly rows counts that fee 31 times. That's why net revenue is divided by `nights` before it is put on each night.
+
+**Star schema vs flat table.** A star schema has a central fact table (here `fact_nightly`, one row per night) surrounded by dimension tables (dates, events, reservations) that describe it. It avoids repeating descriptive data and makes "slice by anything" queries easy. A flat table is simpler to read but repeats data and drifts out of sync. This project keeps normalized tables and exposes a flat *view* for convenience, which gets the benefits of both.
+
+**CTE vs subquery.** A CTE (`WITH name AS (...)`) is a named subquery that you define first and use later. It reads top to bottom like steps and can be referenced more than once. A subquery is nested inline. Most databases run both the same way; CTEs win on readability, which matters when someone else has to check your SQL.
+
+**Window functions.** `ROW_NUMBER()`, `LAG()` and `SUM() OVER (...)` compute across a "window" of related rows without collapsing them the way `GROUP BY` does. `PARTITION BY` splits the rows into groups and `ORDER BY` sets the order inside each group. Used here for the median, the latest-pull flag and price-change deltas.
+
+**Gaps and islands.** To find runs of consecutive dates, subtract each row's `ROW_NUMBER()` from its date. Within a consecutive run that difference is constant, so grouping by it collapses each run into one row with its start, end and length.
+
+**Interval overlap.** Two stays [a.in, a.out) and [b.in, b.out) overlap exactly when `a.in < b.out AND a.out > b.in`. Strict inequalities let a checkout morning and a check-in afternoon share a date. A self-join with this condition showed that every lost request collided with a stay that was already sold.
+
+**Data validation.** Don't trust a pipeline because it ran; prove it. Reconciliation compares the output with the source (nightly prices sum to the stay's rent to the cent), invariants catch impossible states (a double-booked night), and a quality log records every judgement call. Here the build fails loudly rather than producing a wrong dashboard.
+
+---
+
+## 10 likely interview questions, with honest answers
+
+1. **Walk me through the pipeline.**
+   Python pulls reservations and calendar data from the Hospitable REST API (GET only, paginated, with backoff) into timestamped raw JSON. A transform step cleans it, converts cents to dollars and assigns surrogate ids. A load step builds a SQLite model and runs reconciliation checks. Thirteen SQL queries answer the business questions, and anonymized CSV exports feed a Streamlit dashboard. `run_all.py` runs the whole thing.
+
+2. **How do you know the numbers are right?**
+   Three layers. The build fails if nightly prices don't sum to each stay's rent to the cent, if any night is double booked, or if the calendar disagrees with the bookings. The headline figures matched an independent manual pull exactly (139 nights, 51 booked, $284.14 ADR, $8,786.61 net). And tests check the KPI math against a hand calculation on a synthetic fixture.
+
+3. **What was the hardest data problem?**
+   The API didn't match the spec. Its status filter rejected "declined" and "expired", so I pulled every status and mapped `denied` to declined. One stay had duplicate nightly rows from a split rate, and the Vrbo stay had no nightly prices at all. I logged each fix in a data-quality table instead of silently patching it.
+
+4. **Why SQLite and not Postgres?**
+   It's one property with 15 bookings, so a file database with zero setup is the right size. The SQL is standard apart from a few functions, and each query notes the Postgres equivalent (date subtraction instead of `julianday`, `COUNT(*) FILTER`, `CEIL`, NUMERIC money).
+
+5. **How did you protect guest privacy?**
+   Raw JSON never leaves a gitignored folder. Tables carry surrogate ids, not names or confirmation codes. The dashboard reads only anonymized exports. A pre-commit hook blocks commits containing emails, phone numbers, booking codes or the token, and a test scans every export for those patterns.
+
+6. **What's the main finding?**
+   It isn't price level: at the latest comp pull our asks sit between -16% and +7% of the market median. The problems are weeknight demand (31% vs 51% weekend occupancy), Vrbo losing every unconverted request to dates already sold on Airbnb, and 22.5% of rent going to discounts. The biggest recoverable block is 45 unsold nights from Nov 8 to Dec 22.
+
+7. **How did you calculate the median without a MEDIAN function?**
+   `ROW_NUMBER()` over lead time plus `COUNT(*) OVER ()`, then keep rows where rn is `(n+1)/2` or `(n+2)/2` using integer division and average them. That handles both odd and even counts. The result is 77 days.
+
+8. **What are the limitations?**
+   Nine stays is a tiny sample, so this is descriptive, not statistical. Comps are list prices, not achieved rates. Revenue is spread evenly across a stay's nights. There's only a few days of calendar-snapshot history so far, so booking pace isn't measurable yet; the scheduled daily run fixes that over time.
+
+9. **What would you do with more time or data?**
+   Build booking-pace curves from the daily snapshots (how many future nights were sold N days out), add more properties to compare, and test pricing changes properly, for example alternating weeknight minimums and measuring the effect on fill rate.
+
+10. **Why a date spine?**
+    The bookings table only contains sold nights. To measure occupancy you need the unsold ones too, so every date gets a row and bookings are LEFT JOINed on. An inner join would drop the empty nights and make occupancy look like 100%.
