@@ -1,9 +1,25 @@
+# Kaizen Corp Housing brand: black, ivory, one gold. Corners 0px, 1px warm hairlines.
 [theme]
-base = "light"
-primaryColor = "#2a78d6"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f6f5f2"
-textColor = "#0b0b0b"
+base = "dark"
+primaryColor = "#D4AF5F"
+backgroundColor = "#050505"
+secondaryBackgroundColor = "#0C0C0B"
+textColor = "#F2EFE6"
+linkColor = "#D4AF5F"
+borderColor = "#2E2A1D"
+dataframeBorderColor = "#2E2A1D"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "0px"
+font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+headingFont = "Jost:https://fonts.googleapis.com/css2?family=Jost:wght@300;400&display=swap"
+codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+headingFontWeights = 300
+
+[theme.sidebar]
+backgroundColor = "#0C0C0B"
+secondaryBackgroundColor = "#050505"
+borderColor = "#2E2A1D"
 
 [server]
 headless = true
