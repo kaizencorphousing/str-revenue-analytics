@@ -52,7 +52,7 @@ def main() -> None:
         exports[name] = pd.read_sql((SQL_DIR / f"{stem}.sql").read_text(encoding="utf-8"), con)
     con.close()
     for name, df in exports.items():
-        df.to_csv(OUT_DIR / f"{name}.csv", index=False)
+        df.to_csv(OUT_DIR / f"{name}.csv", index=False, lineterminator="\n")
         print(f"  data/processed/{name}.csv  {len(df)} rows")
 
 

@@ -78,7 +78,7 @@ def main() -> None:
         sql = path.read_text(encoding="utf-8")
         df = pd.read_sql(sql, con)
         results[path.stem] = df
-        df.to_csv(OUT_DIR / f"{path.stem}.csv", index=False)
+        df.to_csv(OUT_DIR / f"{path.stem}.csv", index=False, lineterminator="\n")
         sections.append(f"## {path.stem}\n\n**Question:** {question(sql)}\n\n"
                         f"Source: [`sql/analysis/{path.name}`](../sql/analysis/{path.name})\n\n{md_table(df)}\n")
         print(f"  {path.stem:<28} {len(df):>3} rows")
@@ -90,7 +90,7 @@ def main() -> None:
           "Each table below is the exact output of the query file named in its heading.\n\n"
           "## Check against the reference numbers (docs/SPEC.md, manual pull Oct 8 2026)\n\n"
           f"{md_table(ref)}\n\n" + "\n".join(sections))
-    (OUT_DIR / "RESULTS.md").write_text(md, encoding="utf-8")
+    (OUT_DIR / "RESULTS.md").write_text(md, encoding="utf-8", newline="\n")
 
     print("\nReference check")
     print(ref.to_string(index=False))
