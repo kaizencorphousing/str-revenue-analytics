@@ -1,0 +1,4 @@
+#!/bin/sh
+# Git pre-commit hook: run the same PII/secret scan Claude Code runs, for manual commits too.
+# Enable once per clone:  git config core.hooksPath .githooks
+echo "{}" | python "$(git rev-parse --show-toplevel)/.claude/hooks/pii_guard.py"

@@ -21,9 +21,9 @@ The unit launched in August 2026. September looked great (77% occupancy, driven 
 | 1 | **Demand fell off a cliff after September.** Occupancy went from 76.7% in September to 19.4% in October and 6.7% in November. Overall: 51 of 139 nights booked (36.7%), ADR $284.14, net revenue $8,786.61. | Q01, Q02 |
 | 2 | **Weeknights are the hole, not weekends.** Sun–Thu nights sold 31.0% vs 51.3% for Fri/Sat, and weeknights that did sell went for $136 vs $514. | Q03 |
 | 3 | **Price level isn't the main problem; pricing *strategy* was.** At the latest comp pull our totals sit −16% to +7% of the market median. But key nights swung hard: Sat Nov 14 went $537 → $600 → $205 → $180, and away-game weekends now sit 37% *below* an ordinary weekend while home games are 227% above. | Q08, Q09, Q10 |
-| 4 | **Vrbo lost on availability, not price.** Vrbo converted 1 of 6 requests. All 5 lost requests were for nights already sold on Airbnb weeks earlier, which points to Vrbo availability not being blocked for sold nights. | Q06, Q13 |
+| 4 | **Vrbo lost on availability, not price.** Vrbo converted 1 of 6 requests. All 5 lost requests overlapped nights already sold on Airbnb weeks earlier, which points to Vrbo availability not being blocked for sold nights. | Q06, Q13 |
 | 5 | **Discounts and long stays dilute yield.** Discounts gave away 22.5% of gross rent ($4,103 of $18,206; length-of-stay 9.7%, top-rated 8.4%, promo 3.5%, early booking 0.9%). After the $180 clean, the 31-night stay earned $102/night vs $597/night for 1–2 night stays. | Q05, Q07 |
-| 6 | **The recoverable revenue is specific.** The biggest unsold run is Nov 8–Dec 22: 45 nights worth $7,885 at current asks. October is only 2 nights short of covering rent at the current ask; November needs 8 more nights, December 12. | Q11, Q12 |
+| 6 | **The recoverable revenue is specific.** The biggest unsold run before Dec 31 is Nov 8–Dec 22: 45 nights worth $7,885 at current asks (Jan 4–Mar 18 2027 is a further 74 open nights). Before cleaning costs, October is only 2 nights short of covering rent at the current ask; November needs 8 more nights, December 12. | Q11, Q12 |
 
 ### Actions
 - **Already taken** (from the price-change log, [`data/seed/price_changes.csv`](data/seed/price_changes.csv)): rebuilt pricing in Hospitable after an overwrite (Sep 29), audited prices against the comp median (Oct 4), moved open October nights to "fill mode" (Oct 8), and held the Vanderbilt premier home game at $650.
@@ -149,7 +149,7 @@ Each file starts with the question, its assumptions, and notes on where Postgres
 - **Net revenue is spread evenly across a stay's nights**, so monthly figures for a stay that crosses months are approximate.
 - **August is a partial month** (17 nights) but is compared with a full month's rent.
 - **Surrogate ids (R01…) are ordered by check-in**, so they shift if a new booking lands earlier than existing ones.
-- **Booking-pace analysis needs history.** The pipeline stores a calendar snapshot every run (see [`docs/SCHEDULE.md`](docs/SCHEDULE.md)), but only a few days exist so far.
+- **Booking-pace analysis needs history.** The pipeline stores a calendar snapshot every run (see [`docs/SCHEDULE.md`](docs/SCHEDULE.md)), but only one snapshot exists so far.
 
 ## Reproduce it
 
@@ -159,7 +159,8 @@ cd str-revenue-analytics
 py -m venv .venv
 .venv\Scripts\activate        # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q                     # 44 tests on a synthetic fixture; no private data needed
+git config core.hooksPath .githooks   # enable the PII/secret pre-commit scan
+pytest -q                     # tests on a synthetic fixture; no private data needed
 streamlit run app/dashboard.py   # runs from the committed, anonymized data/processed/ CSVs
 ```
 

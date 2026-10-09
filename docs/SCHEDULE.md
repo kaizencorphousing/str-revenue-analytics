@@ -31,4 +31,4 @@ Create a `logs` folder in the project and add `logs/` to `.gitignore`. Then chan
 
 ## Publishing updates
 
-The schedule only refreshes your local database, `results/` and `data/processed/`. To update the public dashboard, commit and push the changed `data/processed/` and `results/` files. The PII guard checks every commit.
+The schedule only refreshes your local database, `results/` and `data/processed/`. To update the public dashboard, run `pytest -q` (it scans the exports for PII), then commit and push the changed `data/processed/` and `results/` files. The git pre-commit hook in `.githooks/` scans every commit, provided it was enabled once with `git config core.hooksPath .githooks`.

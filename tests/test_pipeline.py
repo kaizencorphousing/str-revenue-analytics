@@ -69,7 +69,8 @@ FORBIDDEN_COLUMNS = {"code", "platform_id", "conversation_id", "guest_name", "fi
                      "email", "phone", "notes"}
 
 
-@pytest.mark.parametrize("csv", sorted(PROCESSED.glob("*.csv")), ids=lambda p: p.stem)
+@pytest.mark.parametrize("csv", sorted(PROCESSED.glob("*.csv")) + sorted((ROOT / "results").glob("*.csv")),
+                         ids=lambda p: f"{p.parent.name}/{p.stem}")
 def test_no_pii_in_processed_exports(csv):
     text = csv.read_text(encoding="utf-8")
     for label, rx in PII_PATTERNS.items():

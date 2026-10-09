@@ -9,7 +9,7 @@ Updated at the end of every phase. A fresh session reads this to know where we a
 | 2 Transform + load | done | Phase 2 commit | 15 reservations, 66 booked nights, 266 calendar rows; 6/6 reconciliation checks pass; 15 tests pass |
 | 3 Analysis SQL | done | Phase 3 commit | 13 queries run; results/RESULTS.md + 13 CSVs; all 16 SPEC reference numbers match exactly |
 | 4 Dashboard | done | Phase 4 commit | Streamlit app runs with 0 exceptions; KPI tiles = query 01 exactly (36.7% / $284.14 / $63.21 / $8,786.61); TABLEAU_GUIDE.md written |
-| 5 Pipeline, tests, docs, repo | built; repo push pending approval | Phase 5 commit | run_all.py --offline clean; 44 tests pass; README, RESUME, SCHEDULE, LEARNING_NOTES complete |
+| 5 Pipeline, tests, docs, repo | built; repo push pending approval | Phase 5 commit | run_all.py --offline clean; 57 tests pass; README, RESUME, SCHEDULE, LEARNING_NOTES complete |
 
 ## Decisions made
 (add as we go: what was decided, why, and who decided)
@@ -34,6 +34,7 @@ Updated at the end of every phase. A fresh session reads this to know where we a
 - 2026-10-08: Colour: blue `#2a78d6` means *booked* only; covered-rent and weekend bars use dark grey. The Streamlit theme is in `.streamlit/config.toml`.
 - 2026-10-08: The date filter (default Aug 15-Dec 31 2026) drives the KPIs, calendar, monthly and weekday charts. Findings stay fixed to the default window.
 - 2026-10-08: Tests run the real transform + load on a synthetic fixture (tests/conftest.py), so pytest passes on a fresh clone without private data. run_all.py --offline needs data/raw/ (gitignored): on a fresh clone it works once raw snapshots are copied in or re-pulled. The dashboard works straight from the committed data/processed/.
+- 2026-10-08: Added a real git pre-commit hook (.githooks/pre-commit, enabled with git config core.hooksPath .githooks) that runs the same PII scan, because the Claude Code hook only covers commits Claude makes. The PII test now also scans results/*.csv.
 
 ## Open issues
 - The monthly chart compares partial August (17 nights) with full rent; the caption says so.

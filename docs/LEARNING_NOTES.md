@@ -54,7 +54,7 @@ The dashboard never calls the API or opens the database: it reads small, anonymi
 
 ## Phase 5: Pipeline, tests, docs
 
-**Built:** `run_all.py` (extract, then load with checks, then queries, then export; `--offline` skips the API), a 44-test pytest suite that runs the real pipeline on a synthetic fixture, the README case study, a resume page and a daily schedule.
+**Built:** `run_all.py` (extract, then load with checks, then queries, then export; `--offline` skips the API), a 57-test pytest suite that runs the real pipeline on a synthetic fixture, the README case study, a resume page and a daily schedule.
 
 **Concept: tests as proof, and orchestration.**
 An orchestrator runs the steps in order and stops at the first failure, so a bad extract can never quietly feed the dashboard. The tests run the *real* transform and load code on a tiny made-up dataset whose answers I worked out by hand (5 booked nights, $160 ADR, $660 net). If the SQL or the cleaning logic changes behaviour, a test fails. Because the fixture is synthetic, the suite runs on a fresh clone without any private guest data, and a separate test scans every exported file for PII patterns.
@@ -98,10 +98,10 @@ An orchestrator runs the steps in order and stops at the first failure, so a bad
    It's one property with 15 bookings, so a file database with zero setup is the right size. The SQL is standard apart from a few functions, and each query notes the Postgres equivalent (date subtraction instead of `julianday`, `COUNT(*) FILTER`, `CEIL`, NUMERIC money).
 
 5. **How did you protect guest privacy?**
-   Raw JSON never leaves a gitignored folder. Tables carry surrogate ids, not names or confirmation codes. The dashboard reads only anonymized exports. A pre-commit hook blocks commits containing emails, phone numbers, booking codes or the token, and a test scans every export for those patterns.
+   Raw JSON never leaves a gitignored folder. Tables carry surrogate ids, not names or confirmation codes. The dashboard reads only anonymized exports. A git pre-commit hook (`.githooks/pre-commit`, the same scan Claude Code runs) blocks commits containing emails, phone numbers, booking codes or the token, and a test scans every export for those patterns.
 
 6. **What's the main finding?**
-   It isn't price level: at the latest comp pull our asks sit between -16% and +7% of the market median. The problems are weeknight demand (31% vs 51% weekend occupancy), Vrbo losing every unconverted request to dates already sold on Airbnb, and 22.5% of rent going to discounts. The biggest recoverable block is 45 unsold nights from Nov 8 to Dec 22.
+   It isn't price level: at the latest comp pull our asks sit between -16% and +7% of the market median. The problems are weeknight demand (31% vs 51% weekend occupancy), Vrbo losing every unconverted request to dates already sold on Airbnb, and 22.5% of rent going to discounts. The biggest recoverable block before year-end is 45 unsold nights from Nov 8 to Dec 22.
 
 7. **How did you calculate the median without a MEDIAN function?**
    `ROW_NUMBER()` over lead time plus `COUNT(*) OVER ()`, then keep rows where rn is `(n+1)/2` or `(n+2)/2` using integer division and average them. That handles both odd and even counts. The result is 77 days.
